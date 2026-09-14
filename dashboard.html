@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThermalShield — Area Specific Passive Shelter Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+            <path d="M4 15.5 12 5l8 10.5" />
+            <path d="M6.5 14.5V20h11v-5.5" />
+            <path d="M12 8.5v6" />
+            <path d="M9 11.5h6" />
+          </svg>
+        </div>
+        <div><b>THERMALSHIELD</b><span>Passive Design Engine</span></div>
+      </div>
+      <div class="nav-label">Workspace</div>
+      <nav class="nav">
+        <button class="active" data-page="studio"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.7">
+            <path d="M3 20h18M5 17V7l7-4 7 4v10M9 17v-5h6v5" />
+          </svg><span>Design Studio</span></button>
+        <button data-page="materials"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.7">
+            <path d="M4 6h16v12H4z" />
+            <path d="m4 10 4 3 4-3 4 3 4-3" />
+          </svg><span>Material Lab</span></button>
+        <button data-page="simulation"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.7">
+            <path d="M4 17V7M10 20V4M16 16V8M22 19V5" />
+          </svg><span>Simulations</span></button>
+        <button data-page="compare"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.7">
+            <path d="M4 5h7v14H4zM13 5h7v14h-7z" />
+          </svg><span>Compare Designs</span></button>
+        <button data-page="reports"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.7">
+            <path d="M6 3h9l4 4v14H6z" />
+            <path d="M14 3v5h5M9 13h6M9 17h6" />
+          </svg><span>Reports</span></button>
+      </nav>
+      <div class="side-bottom"><small>System</small><strong><i class="status-dot"></i>Simulation engine ready</strong>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div class="crumb">Projects / <b>Thermal Passive Shelter</b></div>
+        <div class="top-actions">
+          <div class="pill">DRDO • SIH26051</div><button class="pill primary" id="newBtn">+ New Design</button>
+        </div>
+      </header>
+
+      <section id="studio" class="page active">
+        <div class="content">
+          <div class="hero">
+            <div>
+              <div class="kicker">Environmental Systems / Thermal Control</div>
+              <h1>Design Studio</h1>
+              <p>Location-specific passive shelter design using regional climate data, shelter geometry, material
+                properties and thermal simulation.</p>
+            </div>
+            <div class="hero-stat"><span>Current design score</span><b id="score">--/ 100</b><em>↑ optimized for cold
+                climate</em></div>
+          </div>
+
+          <div class="grid g4">
+            <div class="card metric">
+              <div class="label">Outdoor temperature</div>
+              <div class="value" id="outTemp">°C</div>
+              <div class="sub"></div>
+              <div class="mark">T</div>
+            </div>
+            <div class="card metric">
+              <div class="label">Solar radiation</div>
+              <div class="value"><small style="font-size:12px">W/m²</small></div>
+              <div class="sub"></div>
+              <div class="mark">S</div>
+            </div>
+            <div class="card metric">
+              <div class="label">Wind velocity</div>
+              <div class="value"><small style="font-size:12px">km/h</small></div>
+              <div class="sub"></div>
+              <div class="mark">W</div>
+            </div>
+            <div class="card metric">
+              <div class="label">Target comfort</div>
+              <div class="value">C</div>
+              <div class="sub"></div>
+              <div class="mark">C</div>
+            </div>
+          </div>
+
+          <div class="section-title">01 — Location & Shelter Input</div>
+          <div class="grid g2">
+            <div class="card map-card">
+              <div class="card-head">
+                <h3>Interactive Region Map</h3><span class="tag">MAP PICKER</span>
+              </div>
+              <div class="map-shell">
+                <div id="map" class="map"></div>
+                <div class="map-overlay"></div>
+                <div class="map-scan"></div>
+                <div class="map-location-badge">ACTIVE REGION<span></span></div>
+                <div class="map-compass">N</div>
+                <div class="map-legend"><i class="legend-dot"></i>Selected design point</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Location Profile</h3><small>Selected point</small>
+              </div>
+              <div class="card-body">
+                <div class="profile">
+                  <div class="data"><span>Region</span><b id="region">Loading location…</b></div>
+                  <div class="data"><span>Climate</span><b></b></div>
+                  <div class="data"><span>Latitude</span><b id="lat">—</b></div>
+                  <div class="data"><span>Longitude</span><b id="lng">—</b></div>
+                  <div class="data"><span>Humidity</span><b></b></div>
+                  <div class="data"><span>Solar availability</span><b></b></div>
+                </div>
+                <div style="margin-top:16px;color:#7890a8;font-size:10px;line-height:1.6">Map selection is designed to
+                  feed latitude/longitude into the weather and thermal calculation layer.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">02 — Shelter Configuration</div>
+          <div class="grid g2">
+            <div class="card">
+              <div class="card-head">
+                <h3>Engineering Parameters</h3><small>User defined values</small>
+              </div>
+              <div class="card-body">
+                <div class="form-grid">
+                  <div class="field"><label>Length (m)</label><input id="length" type="number" value="12" step=".1">
+                  </div>
+                  <div class="field"><label>Width (m)</label><input id="width" type="number" value="8" step=".1"></div>
+                  <div class="field"><label>Height (m)</label><input id="height" type="number" value="3.5" step=".1">
+                  </div>
+                  <div class="field"><label>Wall thickness (mm)</label><input id="thickness" type="number" value="450"
+                      step="10"></div>
+                  <div class="field"><label>Budget (₹)</label><input id="budget" type="number" value="500000"
+                      step="1000"></div>
+                  <div class="field"><label>Shelter use</label><select>
+                      <option>Rural Housing</option>
+                      <option>Grain Storage</option>
+                      <option>Livestock Shed</option>
+                      <option>Defense Shelter</option>
+                    </select></div>
+                </div>
+                <div style="height:1px;background:var(--line);margin:17px 0"></div>
+                <div class="field"><label>Roof angle <span class="range-val" id="roofVal">35°</span></label><input
+                    class="range" id="roof" type="range" min="10" max="60" value="35"></div>
+                <div style="height:14px"></div>
+                <div class="field"><label>Orientation</label>
+                  <div class="orientation" id="orientation"><button class="ori">N</button><button
+                      class="ori">NE</button><button class="ori">E</button><button class="ori">SE</button><button
+                      class="ori selected">S</button><button class="ori">SW</button><button
+                      class="ori">W</button><button class="ori">NW</button></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Live Shelter Preview</h3><small id="dims">12 × 8 × 3.5 m</small>
+              </div>
+              <div class="shelter">
+                <div class="sun">☼</div>
+                <div class="heat-arrow">↗</div>
+                <div class="house">
+                  <div class="roof"></div>
+                  <div class="wall"></div>
+                  <div class="window w1"></div>
+                  <div class="window w2"></div>
+                  <div class="door"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">03 — Design Inputs Summary</div>
+          <div class="grid g3">
+            <div class="card">
+              <div class="card-head">
+                <h3>Wall System</h3><span class="tag">450 MM</span>
+              </div>
+              <div class="card-body">
+                <div class="material-stack">
+                  <div class="layer"><b>Mud Brick</b><span>High thermal mass</span></div>
+                  <div class="layer"><b>Straw / local insulation</b><span>Low U-value layer</span></div>
+                  <div class="layer"><b>Mud plaster</b><span>Interior finish</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Roof System</h3><span class="tag">35° SOUTH</span>
+              </div>
+              <div class="card-body">
+                <div class="material-stack">
+                  <div class="layer"><b>Insulated sloped roof</b><span>Reduced heat loss</span></div>
+                  <div class="layer"><b>Reflective surface</b><span>Solar management</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Openings</h3><span class="tag">PASSIVE</span>
+              </div>
+              <div class="card-body">
+                <div class="profile">
+                  <div class="data"><span>Windows</span><b>4</b></div>
+                  <div class="data"><span>Doors</span><b>1</b></div>
+                  <div class="data"><span>Window area</span><b>8.5 m²</b></div>
+                  <div class="data"><span>North exposure</span><b>Minimized</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-actions"><button class="btn" id="resetBtn">Reset</button><button class="btn primary"
+              id="simulateBtn">Run Thermal Simulation →</button></div>
+        </div>
+      </section>
+
+      <section id="materials" class="page">
+        <div class="content">
+          <div class="hero">
+            <div>
+              <div class="kicker">Material intelligence</div>
+              <h1>Material Laboratory</h1>
+              <p>Compare wall and roof systems under the same ambient condition and evaluate thermal performance.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>Wall Material Comparison</h3><span class="tag">COLD CLIMATE</span>
+            </div>
+            <div class="card-body">
+              <table class="material-table">
+                <thead>
+                  <tr>
+                    <th>Material</th>
+                    <th>Typical thickness</th>
+                    <th>Thermal conductivity</th>
+                    <th>Thermal mass</th>
+                    <th>Indicative U-value</th>
+                    <th>Selection</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Mud Brick</td>
+                    <td>300–450 mm</td>
+                    <td>Low–medium</td>
+                    <td>High</td>
+                    <td>0.28</td>
+                    <td><select class="select-material">
+                        <option selected>Selected</option>
+                        <option>Compare</option>
+                      </select></td>
+                  </tr>
+                  <tr>
+                    <td>Stone</td>
+                    <td>300–450 mm</td>
+                    <td>Medium</td>
+                    <td>High</td>
+                    <td>0.45</td>
+                    <td><select class="select-material">
+                        <option>Selected</option>
+                        <option selected>Compare</option>
+                      </select></td>
+                  </tr>
+                  <tr>
+                    <td>Brick</td>
+                    <td>200–300 mm</td>
+                    <td>Medium</td>
+                    <td>Medium</td>
+                    <td>0.65</td>
+                    <td><select class="select-material">
+                        <option>Selected</option>
+                        <option selected>Compare</option>
+                      </select></td>
+                  </tr>
+                  <tr>
+                    <td>Concrete</td>
+                    <td>200–250 mm</td>
+                    <td>High</td>
+                    <td>High</td>
+                    <td>1.20</td>
+                    <td><select class="select-material">
+                        <option>Selected</option>
+                        <option selected>Compare</option>
+                      </select></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="section-title">Composite Wall Builder</div>
+          <div class="grid g2">
+            <div class="card">
+              <div class="card-head">
+                <h3>Recommended Stack</h3><small>Outside → Inside</small>
+              </div>
+              <div class="card-body">
+                <div class="material-stack">
+                  <div class="layer"><b>01 / External surface</b><span>Reflective / weather layer</span></div>
+                  <div class="layer"><b>02 / Mud brick wall</b><span>450 mm • thermal mass</span></div>
+                  <div class="layer"><b>03 / Straw insulation</b><span>100 mm • thermal resistance</span></div>
+                  <div class="layer"><b>04 / Inner mud plaster</b><span>Interior thermal finish</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Material Impact</h3><small>relative performance</small>
+              </div>
+              <div class="card-body">
+                <div class="heatmap">
+                  <div class="heat"><b>−38%</b><span>Heat loss</span>
+                    <div class="bar"></div>
+                  </div>
+                  <div class="heat"><b>+21%</b><span>Thermal lag</span>
+                    <div class="bar"></div>
+                  </div>
+                  <div class="heat"><b>+17%</b><span>Comfort hours</span>
+                    <div class="bar"></div>
+                  </div>
+                  <div class="heat"><b>−12%</b><span>Active energy</span>
+                    <div class="bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="simulation" class="page">
+        <div class="content">
+          <div class="hero">
+            <div>
+              <div class="kicker">Thermal calculation engine</div>
+              <h1>Thermal Simulation</h1>
+              <p>24-hour prediction of indoor temperature, solar gain and heat flow using the defined shelter and
+                ambient profile.</p>
+            </div>
+            <div class="hero-stat"><span>Simulation state</span><b id="simState">READY</b><em id="simNote">Inputs
+                synchronized</em></div>
+          </div>
+          <div class="grid g2">
+            <div class="card">
+              <div class="card-head">
+                <h3>Predicted Indoor vs Outdoor Temperature</h3><span class="tag">24 HOUR</span>
+              </div>
+              <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Thermal Comfort</h3><small>Target 20–24°C</small>
+              </div>
+              <div class="comfort">
+                <div class="comfort-ring">
+                  <div><b>21/24</b><span>comfort hours</span></div>
+                </div><b style="font-size:12px">87% passive comfort</b>
+                <p style="color:var(--muted);font-size:10px;line-height:1.5">The optimized envelope keeps the predicted
+                  internal temperature within the defined comfort band for most of the simulated day.</p>
+              </div>
+            </div>
+          </div>
+          <div class="section-title">Heat Flow & Solar Balance</div>
+          <div class="grid g3">
+            <div class="card">
+              <div class="card-head">
+                <h3>Heat Flow</h3><span class="tag">Q = U × A × ΔT</span>
+              </div>
+              <div class="card-body">
+                <div class="costline"><span>Walls</span><b>−1.62 kW</b></div>
+                <div class="costline"><span>Roof</span><b>−1.21 kW</b></div>
+                <div class="costline"><span>Openings</span><b>−0.69 kW</b></div>
+                <div class="costline"><span>Floor</span><b>−0.43 kW</b></div>
+                <div class="costline total"><span>Total heat loss</span><b>3.95 kW</b></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Solar Energy</h3><span class="tag">PASSIVE GAIN</span>
+              </div>
+              <div class="card-body">
+                <div class="costline"><span>Solar radiation</span><b>640 W/m²</b></div>
+                <div class="costline"><span>Solar capture</span><b>15.36 kWh/day</b></div>
+                <div class="costline"><span>Passive contribution</span><b>42%</b></div>
+                <div class="progress"><i style="width:42%"></i></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Wind / Temperature</h3><span class="tag">CORRELATION</span>
+              </div>
+              <div class="chart-wrap" style="height:220px"><canvas id="windChart"></canvas></div>
+            </div>
+          </div>
+          <div class="section-title">Passive Design Recommendations</div>
+          <div class="grid g2">
+            <div class="card">
+              <div class="card-head">
+                <h3>Optimization Engine</h3><small>Recommended actions</small>
+              </div>
+              <div class="card-body">
+                <div class="rec"><b>Enhance insulation</b>
+                  <p>Use a composite mud-brick + local insulation wall to reduce envelope heat loss.</p>
+                  <button>APPLIED</button>
+                </div>
+                <div class="rec"><b>Optimize solar orientation</b>
+                  <p>Maintain a south-facing solar collection surface to use the region's high solar availability.</p>
+                  <button>APPLIED</button>
+                </div>
+                <div class="rec"><b>Control openings</b>
+                  <p>Minimize unnecessary north-facing openings and manage infiltration under high wind.</p>
+                  <button>APPLIED</button>
+                </div>
+                <div class="rec"><b>Consider Trombe wall</b>
+                  <p>Add a passive solar wall strategy where appropriate to increase thermal storage and night-time heat
+                    availability.</p><button>RECOMMENDED</button>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Performance Summary</h3><small>Optimized design</small>
+              </div>
+              <div class="card-body">
+                <div class="costline"><span>Predicted minimum indoor</span><b>16.2°C</b></div>
+                <div class="costline"><span>Predicted maximum indoor</span><b>24.1°C</b></div>
+                <div class="costline"><span>Total heat loss</span><b>3.95 kW</b></div>
+                <div class="costline"><span>Solar gain</span><b>8.1 kWh/day</b></div>
+                <div class="costline"><span>Comfort duration</span><b style="color:var(--green)">21 / 24 h</b></div>
+                <div class="costline"><span>Active energy dependence</span><b style="color:var(--green)">13%</b></div>
+              </div>
+            </div>
+          </div>
+          <div class="footer-actions"><button class="btn" onclick="showPage('compare')">Compare Designs</button><button
+              class="btn primary" onclick="showPage('reports')">Generate Design Report →</button></div>
+        </div>
+      </section>
+
+      <section id="compare" class="page">
+        <div class="content">
+          <div class="hero">
+            <div>
+              <div class="kicker">Decision support</div>
+              <h1>Compare Designs</h1>
+              <p>Evaluate alternative material and geometry combinations under the same climate condition.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>Thermal Performance Matrix</h3><span class="tag">SAME AMBIENT CONDITION</span>
+            </div>
+            <div class="card-body">
+              <table class="compare">
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Design A</th>
+                    <th>Design B</th>
+                    <th class="best">Optimized</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Wall</td>
+                    <td>Brick 300 mm</td>
+                    <td>Mud 450 mm</td>
+                    <td class="best">Mud + insulation</td>
+                  </tr>
+                  <tr>
+                    <td>Roof</td>
+                    <td>Metal sheet</td>
+                    <td>Tile</td>
+                    <td class="best">Insulated sloped roof</td>
+                  </tr>
+                  <tr>
+                    <td>Orientation</td>
+                    <td>East</td>
+                    <td>South</td>
+                    <td class="best">South</td>
+                  </tr>
+                  <tr>
+                    <td>Roof angle</td>
+                    <td>20°</td>
+                    <td>30°</td>
+                    <td class="best">35°</td>
+                  </tr>
+                  <tr>
+                    <td>Minimum indoor temp.</td>
+                    <td>7.0°C</td>
+                    <td>11.0°C</td>
+                    <td class="best">16.2°C</td>
+                  </tr>
+                  <tr>
+                    <td>Maximum indoor temp.</td>
+                    <td>29.0°C</td>
+                    <td>26.0°C</td>
+                    <td class="best">24.1°C</td>
+                  </tr>
+                  <tr>
+                    <td>Comfort hours</td>
+                    <td>9 / 24</td>
+                    <td>15 / 24</td>
+                    <td class="best">21 / 24</td>
+                  </tr>
+                  <tr>
+                    <td>Heat loss</td>
+                    <td>7.2 kW</td>
+                    <td>5.1 kW</td>
+                    <td class="best">3.95 kW</td>
+                  </tr>
+                  <tr>
+                    <td>Solar gain</td>
+                    <td>4.2 kWh</td>
+                    <td>6.8 kWh</td>
+                    <td class="best">8.1 kWh</td>
+                  </tr>
+                  <tr>
+                    <td>Estimated cost</td>
+                    <td>₹2.10 L</td>
+                    <td>₹2.40 L</td>
+                    <td class="best">₹2.60 L</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="section-title">Design Decision</div>
+          <div class="card">
+            <div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:20px">
+              <div><b style="font-size:14px">Optimized design provides the strongest thermal-comfort performance.</b>
+                <p style="color:var(--muted);font-size:10px;margin:6px 0">The recommendation prioritizes passive thermal
+                  maintenance while respecting the defined shelter inputs and budget.</p>
+              </div><button class="btn primary" onclick="showPage('reports')">Use Optimized Design →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reports" class="page">
+        <div class="content">
+          <div class="hero">
+            <div>
+              <div class="kicker">Engineering documentation</div>
+              <h1>Design Report</h1>
+              <p>Generate a clean summary for design review, DRDO evaluation or project documentation.</p>
+            </div>
+          </div>
+          <div class="grid g2">
+            <div class="card">
+              <div class="card-head">
+                <h3>Report Contents</h3><span class="tag">PDF READY</span>
+              </div>
+              <div class="card-body">
+                <div class="costline"><span>01 — Location & climate</span><b>Included</b></div>
+                <div class="costline"><span>02 — Shelter geometry</span><b>Included</b></div>
+                <div class="costline"><span>03 — Material specification</span><b>Included</b></div>
+                <div class="costline"><span>04 — Thermal simulation</span><b>Included</b></div>
+                <div class="costline"><span>05 — Solar energy estimate</span><b>Included</b></div>
+                <div class="costline"><span>06 — Heat flow details</span><b>Included</b></div>
+                <div class="costline"><span>07 — Optimized recommendation</span><b>Included</b></div>
+                <div class="costline"><span>08 — Cost estimate</span><b>Included</b></div>
+                <div class="footer-actions"><button class="btn primary" id="pdfBtn">Download Summary PDF</button></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Project Cost</h3><small>Illustrative estimate</small>
+              </div>
+              <div class="card-body">
+                <div class="costline"><span>Envelope materials</span><b>₹3,28,000</b></div>
+                <div class="costline"><span>Insulation & passive systems</span><b>₹38,000</b></div>
+                <div class="costline"><span>Openings / roof</span><b>₹1,04,000</b></div>
+                <div class="costline total"><span>Total estimate</span><b>₹4,70,000</b></div>
+                <div class="progress"><i style="width:94%"></i></div>
+                <p style="color:var(--muted);font-size:9px;margin-top:8px">Budget used: ₹4.70 L of ₹5.00 L. Values are
+                  prototype estimates and should be replaced by validated regional cost data.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <div class="toast" id="toast">Simulation updated successfully.</div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const API_BASE = '/api/weather';
+    let map, marker, tempChart, windChart;
+    let weatherData = null;
+    let selectedLocation = { lat: 34.1526, lon: 77.5771 };
+
+    const toast = (msg) => {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    };
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
+      document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === id));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (id === 'simulation') setTimeout(() => renderCharts(), 100);
+    }
+    window.showPage = showPage;
+
+    document.querySelectorAll('.nav button').forEach(b => {
+      b.addEventListener('click', () => showPage(b.dataset.page));
+    });
+
+    function setText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = value;
+    }
+
+    function formatNumber(value, decimals = 1) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return '—';
+      return Number(value).toFixed(decimals);
+    }
+
+    function updateDashboard(data) {
+      weatherData = data;
+      const c = data.current || {};
+      const loc = data.location || {};
+
+      setText('region', loc.name || 'Unknown location');
+      setText('lat', formatNumber(loc.latitude, 4) + '°');
+      setText('lng', formatNumber(loc.longitude, 4) + '°');
+      setText('outTemp', c.temperature !== null && c.temperature !== undefined
+        ? formatNumber(c.temperature, 1) + '°C'
+        : '—');
+
+      const metricCards = document.querySelectorAll('.metric');
+      if (metricCards.length >= 4) {
+        metricCards[0].querySelector('.sub').textContent =
+          `${loc.name || 'Selected location'} • ${c.weather_description || 'Current conditions'}`;
+
+        metricCards[1].querySelector('.value').innerHTML =
+          `${formatNumber(c.solar_radiation, 0)} <small style="font-size:12px">W/m²</small>`;
+        metricCards[1].querySelector('.sub').textContent =
+          c.solar_radiation != null ? 'Live solar radiation' : 'Solar data unavailable';
+
+        metricCards[2].querySelector('.value').innerHTML =
+          `${formatNumber(c.wind_speed, 1)} <small style="font-size:12px">km/h</small>`;
+        metricCards[2].querySelector('.sub').textContent =
+          c.wind_direction != null
+            ? `Direction ${formatNumber(c.wind_direction, 0)}°`
+            : 'Live wind velocity';
+
+        metricCards[3].querySelector('.value').textContent = '22–25°C';
+        metricCards[3].querySelector('.sub').textContent = 'Target comfort range';
+      }
+
+      const profile = document.querySelector('.profile');
+      if (profile) {
+        const rows = profile.querySelectorAll('.data');
+        if (rows[1]) rows[1].querySelector('b').textContent = loc.climate || 'Unknown climate';
+        if (rows[4]) rows[4].querySelector('b').textContent =
+          c.humidity != null ? `${formatNumber(c.humidity, 0)} %` : '—';
+        if (rows[5]) rows[5].querySelector('b').textContent =
+          c.solar_radiation != null
+            ? (c.solar_radiation >= 500 ? 'High' : c.solar_radiation >= 200 ? 'Moderate' : 'Low')
+            : '—';
+      }
+
+      const badge = document.querySelector('.map-location-badge span');
+      if (badge) badge.textContent = loc.name || 'Selected location';
+
+      if (marker) {
+        marker.bindPopup(
+          `<b>${escapeHtml(loc.name || 'Selected location')}</b><br>` +
+          `${formatNumber(loc.latitude, 4)}°, ${formatNumber(loc.longitude, 4)}°<br>` +
+          `${escapeHtml(c.weather_description || 'Current conditions')}`
+        );
+      }
+
+      document.querySelector('.hero-stat em').textContent =
+        loc.climate ? `↑ ${loc.climate}` : 'Live climate profile';
+
+      toast(`Weather updated for ${loc.name || 'selected location'}`);
+      renderCharts();
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      }[ch]));
+    }
+
+    async function fetchWeather(lat, lon, showToast = true) {
+      selectedLocation = { lat, lon };
+      try {
+        const response = await fetch(
+          `${API_BASE}?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`,
+          { cache: 'no-store' }
+        );
+
+        if (!response.ok) {
+          let detail = `Weather API returned ${response.status}`;
+          try {
+            const error = await response.json();
+            if (error.detail) detail = error.detail;
+          } catch (_) { }
+          throw new Error(detail);
+        }
+
+        const data = await response.json();
+        updateDashboard(data);
+
+        if (showToast) toast('Live weather data loaded');
+        return data;
+      } catch (error) {
+        console.error('Weather API error:', error);
+        toast('Could not load live weather data');
+        setText('region', 'Weather unavailable');
+        return null;
+      }
+    }
+
+    function initializeMap() {
+      map = L.map('map', { zoomControl: true }).setView(
+        [selectedLocation.lat, selectedLocation.lon], 8
+      );
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      const dynamicIcon = L.divIcon({
+        className: '',
+        html: '<div class="dynamic-marker"><div class="pulse"></div><div class="pulse2"></div><div class="core"></div></div>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -16]
+      });
+
+      marker = L.marker(
+        [selectedLocation.lat, selectedLocation.lon],
+        { icon: dynamicIcon }
+      ).addTo(map);
+
+      map.on('click', async e => {
+        marker.setLatLng(e.latlng);
+        map.flyTo(e.latlng, Math.max(map.getZoom(), 9), { duration: .8 });
+
+        setText('lat', e.latlng.lat.toFixed(4) + '°');
+        setText('lng', e.latlng.lng.toFixed(4) + '°');
+        setText('region', 'Loading location…');
+
+        await fetchWeather(e.latlng.lat, e.latlng.lng);
+      });
+
+      map.on('zoomend', () => {
+        const z = map.getZoom();
+        const badge = document.querySelector('.map-location-badge');
+        if (badge) badge.style.opacity = Math.min(1, 0.72 + (z - 7) * 0.08);
+      });
+    }
+
+    async function useBrowserLocation() {
+      if (!navigator.geolocation) {
+        await fetchWeather(selectedLocation.lat, selectedLocation.lon);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async position => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          selectedLocation = { lat, lon };
+          map.setView([lat, lon], 10);
+          marker.setLatLng([lat, lon]);
+
+          setText('region', 'Loading location…');
+          setText('lat', lat.toFixed(4) + '°');
+          setText('lng', lon.toFixed(4) + '°');
+
+          await fetchWeather(lat, lon);
+        },
+        async () => {
+          // Permission denied/unavailable: use the existing map default.
+          await fetchWeather(selectedLocation.lat, selectedLocation.lon, false);
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+      );
+    }
+
+    document.querySelectorAll('.ori').forEach(x => {
+      x.addEventListener('click', () => {
+        document.querySelectorAll('.ori').forEach(y => y.classList.remove('selected'));
+        x.classList.add('selected');
+      });
+    });
+
+    $('roof').addEventListener('input', e => {
+      $('roofVal').textContent = e.target.value + '°';
+    });
+
+    ['length', 'width', 'height'].forEach(id => {
+      $(id).addEventListener('input', () => {
+        $('dims').textContent =
+          `${$('length').value} × ${$('width').value} × ${$('height').value} m`;
+      });
+    });
+
+    function renderCharts() {
+      if (!weatherData) return;
+
+      const hourly = weatherData.hourly || {};
+      const times = hourly.time || [];
+      const temperatures = hourly.temperature || [];
+      const wind = hourly.wind_speed || [];
+
+      const labels = times.map(t => {
+        const d = new Date(t);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      });
+
+      const outdoor = temperatures.map(v => Number(v));
+      const indoor = outdoor.map((v, i) => {
+        if (v === null || Number.isNaN(v)) return null;
+        const c = weatherData.current || {};
+        const apparent = Number(c.apparent_temperature);
+        const base = Number.isFinite(apparent) ? apparent : v;
+        const smoothing = i === 0 ? base : outdoor[i - 1];
+        return Number((v * 0.35 + smoothing * 0.35 + 20 * 0.30).toFixed(1));
+      });
+
+      const upper = Array(labels.length).fill(25);
+      const lower = Array(labels.length).fill(22);
+
+      const ctx = $('tempChart').getContext('2d');
+      if (tempChart) tempChart.destroy();
+
+      tempChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Outdoor', data: outdoor, borderColor: '#6d8cff', backgroundColor: 'rgba(92,124,255,.08)', tension: .4, fill: false, borderWidth: 2, pointRadius: 2 },
+            { label: 'Estimated indoor', data: indoor, borderColor: '#48d7ff', backgroundColor: 'rgba(20,159,201,.10)', tension: .4, fill: true, borderWidth: 2, pointRadius: 2 },
+            { label: 'Comfort upper', data: upper, borderColor: '#48e0ad', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 },
+            { label: 'Comfort lower', data: lower, borderColor: '#48e0ad', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#8fa5bd', font: { size: 9 } } } },
+          scales: {
+            x: { grid: { color: 'rgba(70,100,135,.09)' }, ticks: { color: '#7189a3', font: { size: 9 } } },
+            y: {
+              grid: { color: 'rgba(70,100,135,.09)' },
+              ticks: { color: '#7189a3', font: { size: 9 } },
+              title: { display: true, text: 'Temperature °C', color: '#7189a3', font: { size: 9 } }
+            }
+          }
+        }
+      });
+
+      const windPoints = [];
+      for (let i = 0; i < Math.min(wind.length, outdoor.length); i++) {
+        if (wind[i] != null && outdoor[i] != null) {
+          windPoints.push({ x: Number(wind[i]), y: Number(outdoor[i]) });
+        }
+      }
+
+      const c2 = $('windChart').getContext('2d');
+      if (windChart) windChart.destroy();
+
+      windChart = new Chart(c2, {
+        type: 'scatter',
+        data: {
+          datasets: [{
+            label: 'Wind vs temperature',
+            data: windPoints,
+            backgroundColor: '#48d7ff',
+            borderColor: '#48d7ff',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              title: { display: true, text: 'Wind km/h', color: '#7189a3', font: { size: 9 } },
+              grid: { color: 'rgba(70,100,135,.09)' },
+              ticks: { color: '#7189a3', font: { size: 8 } }
+            },
+            y: {
+              title: { display: true, text: 'Outdoor °C', color: '#7189a3', font: { size: 9 } },
+              grid: { color: 'rgba(70,100,135,.09)' },
+              ticks: { color: '#7189a3', font: { size: 8 } }
+            }
+          }
+        }
+      });
+    }
+
+    $('simulateBtn').addEventListener('click', () => {
+      $('simState').textContent = 'CALCULATING';
+      $('simNote').textContent = 'Running 24-hour thermal model…';
+
+      setTimeout(() => {
+        showPage('simulation');
+        $('simState').textContent = 'COMPLETE';
+        $('simNote').textContent = weatherData
+          ? 'Design synchronized with live weather inputs'
+          : 'Waiting for live weather data';
+        toast('Thermal simulation updated using current weather');
+      }, 800);
+    });
+
+    $('resetBtn').addEventListener('click', () => {
+      $('length').value = 12;
+      $('width').value = 8;
+      $('height').value = 3.5;
+      $('thickness').value = 450;
+      $('budget').value = 500000;
+      $('roof').value = 35;
+      $('roofVal').textContent = '35°';
+      $('dims').textContent = '12 × 8 × 3.5 m';
+      toast('Design inputs reset.');
+    });
+
+    $('newBtn').addEventListener('click', () => {
+      showPage('studio');
+      toast('New design workspace ready.');
+    });
+
+    $('pdfBtn').addEventListener('click', () =>
+      toast('PDF export hook ready — connect jsPDF/Puppeteer in backend for final report generation.')
+    );
+
+    window.addEventListener('load', async () => {
+      initializeMap();
+      await useBrowserLocation();
+    });
+  </script>
+</body>
+
+</html>

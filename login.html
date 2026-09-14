@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In — ThermalShield</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --line: rgba(23, 43, 66, 0.10);
+      --text: #10233a;
+      --muted: #5d7690;
+      --muted-soft: #8fa5bd;
+      --accent: #1596c9;
+      --accent2: #4a63d6;
+      --error: #d64545;
+      --shadow: 0 20px 50px rgba(20, 45, 75, 0.08);
+    }
+ 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    html, body { height: 100%; }
+ 
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(74, 99, 214, 0.08), transparent 40%),
+        radial-gradient(circle at 88% 92%, rgba(21, 150, 201, 0.10), transparent 45%),
+        var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      padding: 32px 20px;
+    }
+ 
+    .panel {
+      width: 100%;
+      max-width: 440px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 44px 40px;
+    }
+ 
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+ 
+    .logo {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+ 
+    .logo svg { width: 20px; height: 20px; }
+ 
+    .brand-row .brand-text { text-align: left; }
+ 
+    .brand-row b {
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: block;
+    }
+ 
+    .brand-row small {
+      color: var(--muted-soft);
+      font-size: 10px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+ 
+    h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.2px;
+    }
+ 
+    p.sub {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+ 
+    form {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+ 
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+ 
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+ 
+    .field input {
+      width: 100%;
+      padding: 11px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+ 
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(21, 150, 201, 0.14);
+    }
+ 
+    .field input.invalid {
+      border-color: var(--error);
+    }
+ 
+    .row-between {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      font-size: 12px;
+      margin-top: -4px;
+    }
+ 
+    .row-between a {
+      color: var(--accent2);
+      text-decoration: none;
+      font-weight: 600;
+    }
+ 
+    .error-box {
+      display: none;
+      background: rgba(214, 69, 69, 0.08);
+      border: 1px solid rgba(214, 69, 69, 0.25);
+      color: var(--error);
+      font-size: 12.5px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+ 
+    .error-box.show { display: block; }
+ 
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 13px 0;
+      border-radius: 10px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+ 
+    .btn:hover { transform: translateY(-1px); }
+ 
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: default;
+      transform: none;
+    }
+ 
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(21, 150, 201, 0.28);
+      margin-top: 6px;
+    }
+ 
+    .switch {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+ 
+    .switch a {
+      color: var(--accent2);
+      font-weight: 700;
+      text-decoration: none;
+    }
+ 
+    .footer-note {
+      margin-top: 22px;
+      font-size: 11px;
+      color: var(--muted-soft);
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+ 
+<body>
+  <div class="panel">
+    <div class="brand-row">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+          <path d="M4 15.5 12 5l8 10.5" />
+          <path d="M6.5 14.5V20h11v-5.5" />
+          <path d="M12 8.5v6" />
+          <path d="M9 11.5h6" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <b>THERMALSHIELD</b>
+        <small>Passive Design Engine</small>
+      </div>
+    </div>
+ 
+    <h1>Welcome back</h1>
+    <p class="sub">Log in to pick up your shelter designs right where you left them.</p>
+ 
+    <div class="error-box" id="errorBox"></div>
+ 
+    <form id="loginForm" method="POST" action="/login" novalidate>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" placeholder="you@organization.com" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="Enter your password" required>
+      </div>
+      <div class="row-between">
+        <a href="#">Forgot password?</a>
+      </div>
+      <button class="btn primary" type="submit" id="submitBtn">Log In</button>
+    </form>
+ 
+    <div class="switch">Don't have an account? <a href="/signup">Sign up</a></div>
+    <div class="footer-note">Passive Design Engine · DRDO · SIH26051</div>
+  </div>
+ 
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorBox = document.getElementById('errorBox');
+    const submitBtn = document.getElementById('submitBtn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+ 
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.add('show');
+    }
+ 
+    function clearError() {
+      errorBox.textContent = '';
+      errorBox.classList.remove('show');
+      emailInput.classList.remove('invalid');
+      passwordInput.classList.remove('invalid');
+    }
+ 
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+ 
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in…';
+ 
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          redirect: 'follow'
+        });
+ 
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+ 
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          emailInput.classList.add('invalid');
+          passwordInput.classList.add('invalid');
+          showError(data.error || 'Invalid email or password.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Log In';
+          return;
+        }
+ 
+        window.location.href = '/dashboard';
+      } catch (err) {
+        showError('Could not reach the server. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log In';
+      }
+    });
+  </script>
+</body>
+ 
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThermalShield — Passive Shelter Design Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --line: rgba(23, 43, 66, 0.10);
+      --text: #10233a;
+      --muted: #5d7690;
+      --muted-soft: #8fa5bd;
+      --accent: #1596c9;
+      --accent2: #4a63d6;
+      --shadow: 0 20px 50px rgba(20, 45, 75, 0.08);
+    }
+ 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    html, body { height: 100%; }
+ 
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(74, 99, 214, 0.08), transparent 40%),
+        radial-gradient(circle at 88% 92%, rgba(21, 150, 201, 0.10), transparent 45%),
+        var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      padding: 32px 20px;
+    }
+ 
+    .panel {
+      width: 100%;
+      max-width: 560px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 48px 44px;
+      text-align: center;
+    }
+ 
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+ 
+    .logo {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+ 
+    .logo svg { width: 22px; height: 22px; }
+ 
+    .brand-row .brand-text { text-align: left; }
+ 
+    .brand-row b {
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: block;
+    }
+ 
+    .brand-row small {
+      color: var(--muted-soft);
+      font-size: 10.5px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+ 
+    .kicker {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--accent2);
+      background: rgba(74, 99, 214, 0.08);
+      border: 1px solid rgba(74, 99, 214, 0.18);
+      padding: 5px 11px;
+      border-radius: 100px;
+      margin-bottom: 18px;
+    }
+ 
+    h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 30px;
+      line-height: 1.25;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+ 
+    h1 span {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+ 
+    p.lead {
+      margin: 16px auto 0;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 440px;
+    }
+ 
+    .actions {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+ 
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 13px 0;
+      border-radius: 10px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 1px solid transparent;
+    }
+ 
+    .btn:hover { transform: translateY(-1px); }
+ 
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(21, 150, 201, 0.28);
+    }
+ 
+    .btn.secondary {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--line);
+    }
+ 
+    .footer-note {
+      margin-top: 26px;
+      font-size: 11px;
+      color: var(--muted-soft);
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+ 
+<body>
+  <div class="panel">
+    <div class="brand-row">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+          <path d="M4 15.5 12 5l8 10.5" />
+          <path d="M6.5 14.5V20h11v-5.5" />
+          <path d="M12 8.5v6" />
+          <path d="M9 11.5h6" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <b>THERMALSHIELD</b>
+        <small>Passive Design Engine</small>
+      </div>
+    </div>
+ 
+    <span class="kicker">Environmental Systems · Thermal Control</span>
+ 
+    <h1>Engineer shelters that <span>survive the climate</span>, before you ever break ground.</h1>
+ 
+    <p class="lead">
+      ThermalShield turns regional weather data, shelter geometry, and material science into a single
+      design score — so every structure is optimized for its exact location before construction begins.
+      Built for engineers, planners, and field teams who can't afford to guess.
+    </p>
+ 
+    <div class="actions">
+      <a class="btn primary" href="/signup">Create an account</a>
+      <a class="btn secondary" href="login.html">Log in to your workspace</a>
+    </div>
+ 
+    <div class="footer-note">Passive Design Engine · DRDO · SIH26051</div>
+  </div>
+</body>
+ 
+</html>
